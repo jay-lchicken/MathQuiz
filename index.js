@@ -1,13 +1,89 @@
-document.getElementById("Quiz").style.display = "none";
-document.getElementById("start").addEventListener("click", function() {
-    document.getElementById("startbody").style.display = "none";
-    document.getElementById("Quiz").style.display = "block";
-    generateRandomQuestion()
-
-});
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js'
+import {GoogleAuthProvider,getAuth, signInWithEmailAndPassword,  fetchSignInMethodsForEmail,onAuthStateChanged, signOut, sendPasswordResetEmail, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+var username;
 var score = 0;
 var tries = 0;
 var correctAnswer = 0;
+const firebaseConfig = {
+    apiKey: "AIzaSyD6su1cHYsxq2GXzwtJTFeTaR98gZtluK4",
+    authDomain: "math-quiz-9f398.firebaseapp.com",
+    projectId: "math-quiz-9f398",
+    storageBucket: "math-quiz-9f398.firebasestorage.app",
+    messagingSenderId: "630588276904",
+    appId: "1:630588276904:web:f59d3ace021a85122d829d",
+    measurementId: "G-DT1EDQRP12"
+};
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+async function loadLeaderboard(){
+    const usersCollectionRef = collection(db, 'users');
+    const usersSnapshot = await getDocs(usersCollectionRef);
+    document.getElementById("leaderboard").innerHTML = "";
+    document.getElementById("leaderboard").innerHTML += `
+    <tr>
+            <th>Username</th>
+            <th>Score</th>
+        </tr>`
+    usersSnapshot.forEach((doc) => {
+
+        document.getElementById("leaderboard").innerHTML += `
+        <tr>
+            <td>${doc.id}</td>
+            <td>${doc.data().score}/${doc.data().tries}</td>
+        </tr>`
+        console.log(doc.id, '=>', doc.data());
+    });
+}
+loadLeaderboard()
+
+async function loadData(username) {
+    try {
+        const userDocRef = doc(db, 'users', username);
+
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            score = userData.score;
+            tries = userData.tries;
+            document.getElementById("score").innerHTML = "Score: " + score + "/" + tries;
+
+        } else {
+            console.log('No such document!');
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+    }
+}
+async function saveData(username, score, tries) {
+    try {
+        const userDocRef = doc(db, 'users', username);
+
+        await setDoc(userDocRef, { score: score, tries: tries });
+
+        console.log('Data saved successfully!');
+    } catch (error) {
+        console.error('Error saving data:', error);
+    }
+}
+// Initialize Firebase
+
+document.getElementById("Quiz").style.display = "none";
+document.getElementById("start").addEventListener("click", function() {
+
+    document.getElementById("startbody").style.display = "none";
+    alert("PLEASE WAIT WHILE WE LOAD YOUR DATA.");
+    loadData(document.getElementById("username").value).then(() => {
+        username = document.getElementById("username").value;
+        document.getElementById("Quiz").style.display = "block";
+        generateRandomQuestion()
+    });
+
+
+});
+
 
 function addQuestion(question) {
     var txt = question; /* The text */
@@ -25,6 +101,7 @@ function addQuestion(question) {
     typeWriter();
 }
 function generateRandomQuestion(){
+    loadLeaderboard()
     document.getElementById("score").innerHTML = "Score: " + score + "/" + tries;
     var operation = Math.floor(Math.random()*3);
     if (operation == 0){
@@ -34,6 +111,11 @@ function generateRandomQuestion(){
     }else if (operation == 1) {
         var num1 = Math.floor(Math.random() * 100);
         var num2 = Math.floor(Math.random() * 100);
+        if (num1 < num2) {
+            var temp = num1;
+            num1 = num2;
+            num2 = temp;
+        }
         addQuestion(`${num1} - ${num2}`)
     }else if (operation == 2) {
         var num1 = Math.floor(Math.random() * 10);
@@ -89,6 +171,7 @@ document.getElementById("option1").addEventListener("click", function(){
         score+=1;
     }
     tries+=1;
+    saveData(username, score, tries);
     generateRandomQuestion();
 })
 document.getElementById("option2").addEventListener("click", function(){
@@ -98,6 +181,7 @@ document.getElementById("option2").addEventListener("click", function(){
         score+=1;
     }
     tries+=1;
+    saveData(username, score, tries);
     generateRandomQuestion();
 })
 document.getElementById("option3").addEventListener("click", function(){
@@ -107,6 +191,7 @@ document.getElementById("option3").addEventListener("click", function(){
         score+=1;
     }
     tries+=1;
+    saveData(username, score, tries);
     generateRandomQuestion();
 })
 document.getElementById("option4").addEventListener("click", function(){

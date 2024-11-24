@@ -22,7 +22,40 @@
         h1:hover {
             color: #555;
         }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+        input {
+            padding: 10px;
+            font-size: 1em;
+            margin: 20px 0;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
         button {
             padding: 10px 20px;
             margin: 10px;
@@ -52,7 +85,9 @@
 
     <div id="startbody">
         <h1>Math Quiz</h1>
+        <input id="username" placeholder="Username">
         <button id="start">Start Quiz</button>
+
     </div>
     <div id="Quiz">
         <h1>Math Quiz</h1>
@@ -64,8 +99,16 @@
         <button id="option4">4</button>
     </div>
     <p>Do Not Inspect Element This Page as it ruins the fun 🤩</p>
-    <script src="index.js"></script>
+    <p>Did u know that if u sign in with the same username again, ur score gets restored?</p>
+    <script src="index.js" type="module"></script>
+    <h1>Leaderboard</h1>
+    <table id="leaderboard">
+        <tr>
+            <th>Username</th>
+            <th>Score</th>
+        </tr>
 
+    </table>
 </body>
 
 </html>
