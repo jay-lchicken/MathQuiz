@@ -5,31 +5,61 @@ document.getElementById("start").addEventListener("click", function() {
     generateRandomQuestion()
 
 });
+var score = 0;
+var tries = 0;
+var correctAnswer = 0;
+
+function addQuestion(question) {
+    var txt = question; /* The text */
+    var speed = 100; /* The speed/duration of the effect in milliseconds */
+    var i = 0;
+    document.getElementById("question").innerHTML = "";
+    function typeWriter() {
+        if (i < txt.length) {
+            document.getElementById("question").innerHTML += txt.charAt(i);
+            i++;
+            setTimeout(typeWriter, speed);
+        }
+    }
+
+    typeWriter();
+}
 function generateRandomQuestion(){
+    document.getElementById("score").innerHTML = "Score: " + score + "/" + tries;
     var operation = Math.floor(Math.random()*3);
     if (operation == 0){
         var num1 = Math.floor(Math.random()*100);
         var num2 = Math.floor(Math.random()*100);
-        document.getElementById("question").innerHTML = num1 + " + " + num2;
+        addQuestion(`${num1} + ${num2}`);
     }else if (operation == 1) {
         var num1 = Math.floor(Math.random() * 100);
         var num2 = Math.floor(Math.random() * 100);
-        document.getElementById("question").innerHTML = num1 + " - " + num2;
+        addQuestion(`${num1} - ${num2}`)
     }else if (operation == 2) {
         var num1 = Math.floor(Math.random() * 10);
         var num2 = Math.floor(Math.random() * 10);
-        document.getElementById("question").innerHTML = num1 + " * " + num2;
+        addQuestion(`${num1} * ${num2}`)
     }
-    var correctAnswerPosition = Math.floor(Math.random()*4);
+    var answerPosition = Math.floor(Math.random()*4);
     var answers = [];
+
     for (let x = 0; x<4;x++){
-        if (x == correctAnswerPosition){
+        if (x == answerPosition){
             if (operation == 0){
                 answers.push(num1 + num2);
+                correctAnswer = num1 + num2;
             }else if (operation == 1){
+                if (num1 < num2) {
+                    var temp = num1;
+                    num1 = num2;
+                    num2 = temp;
+                }
                 answers.push(num1 - num2);
+                correctAnswer = num1 - num2;
+
             }else if (operation == 2){
                 answers.push(num1 * num2);
+                correctAnswer = num1 * num2;
             }
         }else {
             var wrongAnswer;
@@ -43,12 +73,48 @@ function generateRandomQuestion(){
             answers.push(wrongAnswer);
         }
     }
-    alert(answers);
     var index = 0;
     for (let i of answers){
-        alert("option"+index);
-        alert(i);
         document.getElementById("option"+(index+1)).textContent = i;
         index++;
     }
+
 }
+
+document.getElementById("option1").addEventListener("click", function(){
+
+    if (document.getElementById("option1").textContent == String(correctAnswer)) {
+
+        alert("Correct");
+        score+=1;
+    }
+    tries+=1;
+    generateRandomQuestion();
+})
+document.getElementById("option2").addEventListener("click", function(){
+
+    if (document.getElementById("option2").textContent == String(correctAnswer)) {
+        alert("Correct");
+        score+=1;
+    }
+    tries+=1;
+    generateRandomQuestion();
+})
+document.getElementById("option3").addEventListener("click", function(){
+
+    if (document.getElementById("option3").textContent == String(correctAnswer)) {
+        alert("Correct");
+        score+=1;
+    }
+    tries+=1;
+    generateRandomQuestion();
+})
+document.getElementById("option4").addEventListener("click", function(){
+
+    if (document.getElementById("option4").textContent == correctAnswer) {
+        alert("Correct");
+        score+=1;
+    }
+    tries+=1;
+    generateRandomQuestion();
+})
